@@ -65,16 +65,41 @@ class BackController extends Controller
         ]);
     }
 
+    // public function actionCreate()
+    // {
+    //     $model = new Collective();
+
+    //     $post = Yii::$app->request->post();
+    //     $load = $model->load($post);
+
+    //     if ($load && $model->save()) {
+    //         Yii::$app->session->setFlash('success', 'Запись успешно создана!');
+    //         return $this->redirect(Url::previous());
+    //     }
+
+    //     return $this->render('create', [
+    //         'model' => $model,
+    //     ]);
+    // }
+
     public function actionCreate()
     {
         $model = new Collective();
 
-        $post = Yii::$app->request->post();
-        $load = $model->load($post);
+        if (!empty(Yii::$app->request->post('Collective'))) {
+            $post            = Yii::$app->request->post('Collective');
+            $model->name     = $post['name'];
+            $model->position = $post['position'];
+            $parent_id       = $post['parentId'];
 
-        if ($load && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Запись успешно создана!');
-            return $this->redirect(Url::previous());
+            if (empty($parent_id))
+                $model->makeRoot();
+            else {
+                $parent = Collective::findOne($parent_id);
+                $model->appendTo($parent);
+            }
+
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -82,31 +107,74 @@ class BackController extends Controller
         ]);
     }
 
+    // public function actionUpdate($id)
+    // {
+    //     $model = $this->findModel($id);
+
+    //     $post = Yii::$app->request->post();
+    //     $load = $model->load($post);
+
+    //     if ($load && $model->save()) {
+    //         Yii::$app->session->setFlash('success', 'Запись успешно изменена!');
+    //         return $this->redirect(Url::previous());
+    //     }
+
+    //     return $this->render('update', [
+    //         'model' => $model
+    //     ]);
+    // }
+
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
-        $post = Yii::$app->request->post();
-        $load = $model->load($post);
+        if (!empty(Yii::$app->request->post('Collective'))) {
+            $post            = Yii::$app->request->post('Collective');
 
-        if ($load && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Запись успешно изменена!');
-            return $this->redirect(Url::previous());
+            $model->name     = $post['name'];
+            $model->position = $post['position'];
+            $parent_id       = $post['parentId'];
+
+            if ($model->save()) {
+                if (empty($parent_id)) {
+                    if (!$model->isRoot())
+                        $model->makeRoot();
+                } else { // move node to other root 
+                    if ($model->id != $parent_id) {
+                        $parent = Collective::findOne($parent_id);
+                        $model->appendTo($parent);
+                    }
+                }
+
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
-            'model' => $model
+            'model' => $model,
         ]);
     }
 
+    // public function actionDelete($id)
+    // {
+    //     $modelDelete = $this->findModel($id)->delete();
+    //     if (false !== $modelDelete) {
+    //         Yii::$app->session->setFlash('success', 'Запись успешно удалена!');
+    //     }
+
+    //     return $this->redirect(Url::previous());
+    // }
+
     public function actionDelete($id)
     {
-        $modelDelete = $this->findModel($id)->delete();
-        if (false !== $modelDelete) {
-            Yii::$app->session->setFlash('success', 'Запись успешно удалена!');
-        }
+        $model = $this->findModel($id);
 
-        return $this->redirect(Url::previous());
+        if ($model->isRoot())
+            $model->deleteWithChildren();
+        else
+            $model->delete();
+
+        return $this->redirect(['index']);
     }
 
     protected function findModel($id)

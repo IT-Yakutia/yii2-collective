@@ -8,7 +8,7 @@ use yii\grid\SerialColumn;
 use yii\widgets\LinkPager;
 use yii\helpers\Url;
 
-$this->title = 'Баннеры';
+$this->title = 'Коллектив';
 ?>
 <div class="partner-index">
     <div class="row">
@@ -74,22 +74,22 @@ $this->title = 'Баннеры';
                         }
                     ],
                     [
-                        'attribute' => 'position',
+                        'attribute' => 'post',
                         'format' => 'raw',
                         'value' => function ($model) {
-                            return Html::a($model->position, ['update', 'id' => $model->id]);
+                            return Html::a($model->post, ['update', 'id' => $model->id]);
                         }
                     ],
 
-                    [
-                        'attribute' => 'position',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                            $parent = $model->getParent();
-                            $parent_name = $parent ? $model->find($parent->id)->one()->name : 'Никому не подчинаяется';
-                            return Html::a($parent_name, ['update', 'id' => $model->id]);
-                        }
-                    ],
+                    // [
+                    //     'attribute' => 'position',
+                    //     'format' => 'raw',
+                    //     'value' => function ($model) {
+                    //         $parent = $model->getParent();
+                    //         $parent_name = $parent ? $model->find($parent->id)->one()->name : 'Никому не подчинаяется';
+                    //         return Html::a($parent_name, ['update', 'id' => $model->id]);
+                    //     }
+                    // ],
 
                     [
                         'attribute' => 'is_publish',

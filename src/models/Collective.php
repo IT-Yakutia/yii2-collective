@@ -5,6 +5,7 @@ namespace ityakutia\collective\models;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use uraankhayayaal\sortable\behaviors\Sortable;
+use creocoder\nestedsets\NestedSetsBehavior;
 
 class Collective extends ActiveRecord
 {
@@ -20,16 +21,36 @@ class Collective extends ActiveRecord
             'sortable' => [
                 'class' => Sortable::class,
                 'query' => self::find(),
-            ]
+            ],
+            'tree' => [
+                'class' => NestedSetsBehavior::class,
+                'treeAttribute' => 'tree',
+                // 'leftAttribute' => 'lft',
+                // 'rightAttribute' => 'rgt',
+                // 'depthAttribute' => 'depth',
+            ],
         ];
     }
+
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_ALL,
+        ];
+    }
+
+    // public static function find()
+    // {
+    //     return new CategoryQuery(get_called_class());
+    // }
 
     public function rules()
     {
         return [
             [['name', 'photo'], 'required'],
-            [['parent_id', 'sort', 'is_publish', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'photo', 'position', 'phone', 'email'], 'string', 'max' => 255],
+            [['position'], 'default', 'value' => 0],
+            [['tree', 'lft', 'rgt', 'depth', 'position', 'sort', 'is_publish', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['title', 'photo', 'post', 'phone', 'email', 'vk_link', 'fb_link', 'inst_link'], 'string', 'max' => 255],
             ['email', 'email'],
         ];
     }
@@ -40,11 +61,18 @@ class Collective extends ActiveRecord
             'id' => 'ID',
             'name' => 'ФИО',
             'photo' => 'Фото',
-            'position' => 'Должность',
+            'post' => 'Должность',
             'phone' => 'Телефон',
             'email' => 'Email',
+            'vk_link' => 'Ссылка VK',
+            'fb_link' => 'Ссылка Facebook',
+            'inst_link' => 'Ссылка Instagram',
 
-            'parent_id' => 'Подчиняется',
+            'tree' => 'Tree',
+            'lft' => 'Left',
+            'rgt' => 'Right',
+            'depth' => 'Depth',
+            'position' => 'Position',
 
             'sort' => 'Sort',
             'is_publish' => 'Опубликовать',
@@ -54,17 +82,51 @@ class Collective extends ActiveRecord
         ];
     }
 
-    public function getParent()
+    /**
+     * Get parent's ID
+     * @return \yii\db\ActiveQuery 
+     */
+    public function getParentId()
     {
-        if(empty($this->parent)) {
-            return false;
-        }
-
-        return self::find()->where(['id' => $this->parent_id])->one();
+        $parent = $this->parent;
+        return $parent ? $parent->id : null;
     }
 
-    public function getForParent()
+    /**
+     * Get parent's node
+     * @return \yii\db\ActiveQuery 
+     */
+    public function getParent()
     {
-        return self::find()->where(['id', '!=', $this->id])->all();
+        return $this->parents(1)->one();
+    }
+
+    /**
+     * Get a full tree as a list, except the node and its children
+     * @param  integer $node_id node's ID
+     * @return array array of node
+     */
+    public static function getTree($node_id = 0)
+    {
+        // don't include children and the node
+        $children = [];
+
+        if (!empty($node_id))
+            $children = array_merge(
+                self::findOne($node_id)->children()->column(),
+                [$node_id]
+            );
+
+        $rows = self::find()
+            ->select('id, name, depth')
+            ->where(['NOT IN', 'id', $children])
+            ->orderBy('tree, lft, position')
+            ->all();
+
+        $return = [];
+        foreach ($rows as $row)
+            $return[$row->id] = str_repeat('-', $row->depth) . ' ' . $row->name;
+
+        return $return;
     }
 }

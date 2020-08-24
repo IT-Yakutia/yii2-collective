@@ -20,11 +20,18 @@ class m200823_195321_add_collective extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'photo' => $this->string()->notNull(),
-            'position' => $this->string(),
+            'post' => $this->string(), // не position потому что position будет использоваться в nested
             'email' => $this->string(),
             'phone' => $this->string(),
-            
-            'parent_id' => $this->integer(),
+            'vk_link' => $this->string(),
+            'fb_link' => $this->string(),
+            'inst_link' => $this->string(),
+
+            'tree' => $this->integer()->notNull(),
+            'lft' => $this->integer()->notNull(),
+            'rgt' => $this->integer()->notNull(),
+            'depth' => $this->integer()->notNull(),
+            'position' => $this->integer()->notNull()->defaultValue(0),
 
             'sort' => $this->integer(),
 
@@ -33,7 +40,6 @@ class m200823_195321_add_collective extends Migration
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
-
     }
 
     /**
@@ -43,5 +49,4 @@ class m200823_195321_add_collective extends Migration
     {
         $this->dropTable('collective');
     }
-
 }

@@ -47,6 +47,21 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 
+
+    <div class='form-group field-attribute-parentId'>
+    <?= Html::label('Parent', 'parent', ['class' => 'control-label']);?>
+    <?= Html::dropdownList(
+        'Collective[parentId]',
+        $model->parentId,
+        $model::getTree($model->id),
+        ['prompt' => 'No Parent (saved as root)', 'class' => 'form-control']
+    );?>
+
+    </div>
+
+    <?= $form->field($model, 'position')->textInput(['type' => 'number']) ?>
+
+
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn']) ?>
     </div>

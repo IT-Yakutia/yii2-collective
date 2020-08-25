@@ -1,5 +1,6 @@
 <?php
 
+use ityakutia\collective\models\Collective;
 use uraankhayayaal\materializecomponents\grid\MaterialActionColumn;
 use uraankhayayaal\sortable\grid\Column;
 use yii\helpers\Html;
@@ -60,6 +61,13 @@ $this->title = 'Коллектив';
                         }
                     ],
                     [
+                        'attribute' => 'post',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return Html::a($model->post, ['update', 'id' => $model->id]);
+                        }
+                    ],
+                    [
                         'attribute' => 'phone',
                         'format' => 'raw',
                         'value' => function ($model) {
@@ -74,23 +82,25 @@ $this->title = 'Коллектив';
                         }
                     ],
                     [
-                        'attribute' => 'post',
+                        'attribute' => 'tree',
                         'format' => 'raw',
+                        'filter' => Collective::find()->roots()->select('name', 'id')->indexBy('id')->column(),
                         'value' => function ($model) {
-                            return Html::a($model->post, ['update', 'id' => $model->id]);
+                            if ($model->depth > 0) {
+                                $tree = $model->parents()->all();
+                                $parents = [];
+                                $head = '';
+                                foreach ($tree as $parent) {
+                                    $parents[] = Html::a($head . $parent->name, ['update', 'id' => $parent->id]);
+                                    $head = $head . '-';
+                                }
+
+                                return implode("<br>", $parents); // todo добавить ссылки вместо имён
+                            } else {
+                                return 'Никому не подчинятся';
+                            }
                         }
                     ],
-
-                    // [
-                    //     'attribute' => 'position',
-                    //     'format' => 'raw',
-                    //     'value' => function ($model) {
-                    //         $parent = $model->getParent();
-                    //         $parent_name = $parent ? $model->find($parent->id)->one()->name : 'Никому не подчинаяется';
-                    //         return Html::a($parent_name, ['update', 'id' => $model->id]);
-                    //     }
-                    // ],
-
                     [
                         'attribute' => 'is_publish',
                         'format' => 'raw',

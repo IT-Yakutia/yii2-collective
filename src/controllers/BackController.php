@@ -65,41 +65,30 @@ class BackController extends Controller
         ]);
     }
 
-    // public function actionCreate()
-    // {
-    //     $model = new Collective();
-
-    //     $post = Yii::$app->request->post();
-    //     $load = $model->load($post);
-
-    //     if ($load && $model->save()) {
-    //         Yii::$app->session->setFlash('success', 'Запись успешно создана!');
-    //         return $this->redirect(Url::previous());
-    //     }
-
-    //     return $this->render('create', [
-    //         'model' => $model,
-    //     ]);
-    // }
-
     public function actionCreate()
     {
         $model = new Collective();
-
         if (!empty(Yii::$app->request->post('Collective'))) {
-            $post            = Yii::$app->request->post('Collective');
-            $model->name     = $post['name'];
+            $post = Yii::$app->request->post('Collective');
+            $model->name = $post['name'];
             $model->position = $post['position'];
-            $parent_id       = $post['parentId'];
+            $parent_id = $post['parentId'];
 
-            if (empty($parent_id))
+            if (empty($parent_id)) {
+                $trees_list = $model->getTreesList();
+                if (empty($trees_list)) {
+                    $model->tree = 1;
+                } else {
+                    $max = (int)max($trees_list)['tree'] + 1;
+                    $model->tree = $max;
+                }
                 $model->makeRoot();
-            else {
+            } else {
                 $parent = Collective::findOne($parent_id);
                 $model->appendTo($parent);
             }
 
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
@@ -107,46 +96,28 @@ class BackController extends Controller
         ]);
     }
 
-    // public function actionUpdate($id)
-    // {
-    //     $model = $this->findModel($id);
-
-    //     $post = Yii::$app->request->post();
-    //     $load = $model->load($post);
-
-    //     if ($load && $model->save()) {
-    //         Yii::$app->session->setFlash('success', 'Запись успешно изменена!');
-    //         return $this->redirect(Url::previous());
-    //     }
-
-    //     return $this->render('update', [
-    //         'model' => $model
-    //     ]);
-    // }
-
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if (!empty(Yii::$app->request->post('Collective'))) {
-            $post            = Yii::$app->request->post('Collective');
 
-            $model->name     = $post['name'];
+            $post  = Yii::$app->request->post('Collective');
+            $model->name = $post['name'];
             $model->position = $post['position'];
-            $parent_id       = $post['parentId'];
+            $parent_id = $post['parentId'];
 
             if ($model->save()) {
                 if (empty($parent_id)) {
                     if (!$model->isRoot())
                         $model->makeRoot();
-                } else { // move node to other root 
+                } else {
                     if ($model->id != $parent_id) {
                         $parent = Collective::findOne($parent_id);
                         $model->appendTo($parent);
                     }
                 }
 
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index']);
             }
         }
 
@@ -155,26 +126,46 @@ class BackController extends Controller
         ]);
     }
 
-    // public function actionDelete($id)
-    // {
-    //     $modelDelete = $this->findModel($id)->delete();
-    //     if (false !== $modelDelete) {
-    //         Yii::$app->session->setFlash('success', 'Запись успешно удалена!');
-    //     }
-
-    //     return $this->redirect(Url::previous());
-    // }
-
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
 
-        if ($model->isRoot())
+        if ($model->isRoot()) {
+            // Получаю масимальную ветвь
+            $max_tree = (int)max($model->getTreesList())['tree'];
+
+            // Получаю саб ветки и создаю новые корневые, в которых переназначаю значения веток
+            $leaves = $model::find()->leaves()->all();
+            foreach ($leaves as $leave) {
+                $max_tree++;
+                $depth = 0;
+                $leave->tree = $max_tree;
+                $leave->depth = $depth;
+                $leave->save();
+                $this->rebaseLeaves($leave, $max_tree, $depth);
+            }
+
+            $model->depth = -1;
+            $model->save();
             $model->deleteWithChildren();
-        else
+        } else {
             $model->delete();
+        }
 
         return $this->redirect(['index']);
+    }
+
+    private function rebaseLeaves($model, $tree, $depth)
+    {
+        $leaves = $model::find()->leaves()->all();
+        if (!empty($leaves)) {
+            foreach ($leaves as $leave) {
+                $leave->tree = $tree;
+                $leave->depth = $depth;
+                $leave->save();
+                $this->rebaseLeaves($leave, $tree, $depth++);
+            }
+        }
     }
 
     protected function findModel($id)

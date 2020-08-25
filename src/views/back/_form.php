@@ -2,6 +2,7 @@
 
 use uraankhayayaal\materializecomponents\checkbox\WCheckbox;
 use uraankhayayaal\materializecomponents\imgcropper\Cropper;
+use uraankhayayaal\redactor\RedactorWidget;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -21,46 +22,62 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col s12 m6 l6">
-            <?= $form->field($model, 'position')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'post')->textInput(['maxlength' => true]) ?>
         </div>
+
         <div class="col s12 m6 l6">
             <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
         </div>
+
         <div class="col s12 m6 l6">
             <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
         </div>
+        <div class="col s12 m6 l6">
+            <?= $form->field($model, 'vk_link')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col s12 m6 l6">
+            <?= $form->field($model, 'fb_link')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col s12 m6 l6">
+            <?= $form->field($model, 'inst_link')->textInput(['maxlength' => true]) ?>
+        </div>
 
-        
     </div>
 
     <div class="row">
-        <div class="col s12 m6 l6">
-            
-            <?= $form->field($model, 'photo')->widget(Cropper::class, [
-                //'aspectRatio' => 734/1920,
-                'maxSize' => [1000, 1000, 'px'],
-                'minSize' => [10, 10, 'px'],
-                'startSize' => [100, 100, '%'],
-                'uploadUrl' => Url::to(['/collective/back/uploadImg']),
+        <div class="col s12">
+            <?= $form->field($model, 'description')->widget(RedactorWidget::class, [
+                'settings' => [
+                    'lang' => 'ru',
+                    'minHeight' => 200,
+                    'plugins' => [
+                        'fullscreen',
+                        'fontcolor',
+                        'fontfamily',
+                        'fontsize',
+                        'limiter',
+                        'table',
+                        'textdirection',
+                        'textexpander',
+                    ]
+                ],
+                'class' => 'materialize-textarea',
             ]); ?>
-            <small>Your upload img have to has maximum size of: 1000x1000 px and 2Mb</small>
         </div>
     </div>
 
-
     <div class='form-group field-attribute-parentId'>
-    <?= Html::label('Parent', 'parent', ['class' => 'control-label']);?>
-    <?= Html::dropdownList(
-        'Collective[parentId]',
-        $model->parentId,
-        $model::getTree($model->id),
-        ['prompt' => 'No Parent (saved as root)', 'class' => 'form-control']
-    );?>
+        <?= Html::label('Подчинённый у', 'parent', ['class' => 'control-label']); ?>
+        <?= Html::dropdownList(
+            'Collective[parentId]',
+            $model->parentId,
+            $model::getTree($model->id),
+            ['prompt' => 'Не подчиняется', 'class' => 'form-control']
+        ); ?>
 
     </div>
 
     <?= $form->field($model, 'position')->textInput(['type' => 'number']) ?>
-
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn']) ?>

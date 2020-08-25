@@ -39,19 +39,18 @@ class Collective extends ActiveRecord
         ];
     }
 
-    // public static function find()
-    // {
-    //     return new CategoryQuery(get_called_class());
-    // }
+    public static function find()
+    {
+        return new CollectiveQuery(get_called_class());
+    }
 
     public function rules()
     {
         return [
-            [['name', 'photo'], 'required'],
+            [['name'], 'required'],
             [['position'], 'default', 'value' => 0],
-            [['tree', 'lft', 'rgt', 'depth', 'position', 'sort', 'is_publish', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'photo', 'post', 'phone', 'email', 'vk_link', 'fb_link', 'inst_link'], 'string', 'max' => 255],
-            ['email', 'email'],
+            [['tree', 'sort', 'lft', 'rgt', 'depth', 'position', 'is_publish', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['name', 'photo', 'post', 'phone', 'email', 'vk_link', 'fb_link', 'inst_link'], 'string', 'max' => 255],
         ];
     }
 
@@ -68,11 +67,11 @@ class Collective extends ActiveRecord
             'fb_link' => 'Ссылка Facebook',
             'inst_link' => 'Ссылка Instagram',
 
-            'tree' => 'Tree',
+            'tree' => 'Иерархия',
             'lft' => 'Left',
             'rgt' => 'Right',
             'depth' => 'Depth',
-            'position' => 'Position',
+            'position' => 'Позиция в списке',
 
             'sort' => 'Sort',
             'is_publish' => 'Опубликовать',
@@ -128,5 +127,10 @@ class Collective extends ActiveRecord
             $return[$row->id] = str_repeat('-', $row->depth) . ' ' . $row->name;
 
         return $return;
+    }
+
+    public function getTreesList()
+    {
+        return $this->find()->select('tree')->asArray()->all();
     }
 }

@@ -10,8 +10,8 @@ class CollectiveSearch extends Collective
     public function rules()
     {
         return [
-            [['id', 'sort', 'is_publish', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'photo', 'post', 'phone', 'email'], 'safe']
+            [['id', 'is_publish', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['name', 'photo', 'post', 'phone', 'email', 'vk_link', 'fb_link', 'inst_link'], 'safe']
         ];
     }
 
@@ -37,7 +37,7 @@ class CollectiveSearch extends Collective
 
         $query->andFilterWhere([
             'id' => $this->id,
-            
+
             'sort' => $this->sort,
             'is_publish' => $this->is_publish,
             'status' => $this->status,
@@ -45,14 +45,16 @@ class CollectiveSearch extends Collective
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
+        $query
+            ->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'phone', $this->phone])
             ->andFilterWhere(['like', 'vk_link', $this->vk_link])
             ->andFilterWhere(['like', 'fb_link', $this->fb_link])
             ->andFilterWhere(['like', 'inst_link', $this->inst_link])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'post', $this->post])
-            ->andFilterWhere(['like', 'photo', $this->photo]);
+            ->andFilterWhere(['like', 'photo', $this->photo])
+        ;
 
         return $dataProvider;
     }

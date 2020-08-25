@@ -19,8 +19,9 @@ class m200823_195321_add_collective extends Migration
         $this->createTable('collective', [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
-            'photo' => $this->string()->notNull(),
-            'post' => $this->string(), // не position потому что position будет использоваться в nested
+            'description' => $this->text(),
+            'photo' => $this->string(),
+            'post' => $this->string(),
             'email' => $this->string(),
             'phone' => $this->string(),
             'vk_link' => $this->string(),
@@ -34,7 +35,6 @@ class m200823_195321_add_collective extends Migration
             'position' => $this->integer()->notNull()->defaultValue(0),
 
             'sort' => $this->integer(),
-
             'is_publish' => $this->boolean(),
             'status' => $this->smallInteger()->notNull()->defaultValue(10),
             'created_at' => $this->integer()->notNull(),

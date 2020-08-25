@@ -41,7 +41,20 @@ use yii\widgets\ActiveForm;
         <div class="col s12 m6 l6">
             <?= $form->field($model, 'inst_link')->textInput(['maxlength' => true]) ?>
         </div>
+    </div>
 
+    <div class="row">
+        <div class="col s12 m6 l6">
+            
+            <?= $form->field($model, 'photo')->widget(Cropper::class, [
+                //'aspectRatio' => 734/1920,
+                'maxSize' => [2000, 2000, 'px'],
+                'minSize' => [10, 10, 'px'],
+                'startSize' => [100, 100, '%'],
+                'uploadUrl' => Url::to(['/collective/back/uploadImg']),
+            ]); ?>
+            <small>Your upload img have to has maximum size of: 2000x2000 px and 2Mb</small>
+        </div>
     </div>
 
     <div class="row">

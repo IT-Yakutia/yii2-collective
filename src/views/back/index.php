@@ -11,7 +11,7 @@ use yii\helpers\Url;
 
 $this->title = 'Коллектив';
 ?>
-<div class="partner-index">
+<div class="collective-index">
     <div class="row">
         <div class="col s12">
             <p>

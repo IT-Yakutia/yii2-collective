@@ -145,22 +145,27 @@ class BackController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-
         if ($model->isRoot()) {
-            // Получаю масимальную ветвь
-            $max_tree = (int)max($model->getTreesList())['tree'];
 
-            // Получаю саб ветки и создаю новые корневые, в которых переназначаю значения веток
-            $leaves = $model::find()->leaves()->all();
-            foreach ($leaves as $leave) {
-                $max_tree++;
-                $depth = 0;
-                $leave->tree = $max_tree;
-                $leave->depth = $depth;
-                $leave->save();
-                $this->rebaseLeaves($leave, $max_tree, $depth);
+            // Получаю максимальный ID среди ветвей
+            $max_tree = (int)max($model->getTreesList())['tree'] + 1;
+
+            // Флаг для слежения за глубиной дочерних элементов
+            $local_depth = 0;
+            $childs = $model->children()->all();
+            foreach ($childs as $child) {
+                // Если глубина стала меньше, чем сохранённая локально - началась новая ветвь дерева
+                if ($child->depth < $local_depth) {
+                    $max_tree++;
+                }
+                // Каждый раз слежу за глубиной дерева
+                $local_depth = $child->depth;
+                // Задаю новые пераметры ветвям
+                $child->tree = $max_tree;
+                $child->depth = $child->depth - 1;
+                $child->save();
             }
-
+            // Выше перенёс дочерние элементы на новые деревья, поэтому deleteWithChildren удалит только старый корень
             $model->depth = -1;
             $model->save();
             $model->deleteWithChildren();
@@ -169,19 +174,6 @@ class BackController extends Controller
         }
 
         return $this->redirect(['index']);
-    }
-
-    private function rebaseLeaves($model, $tree, $depth)
-    {
-        $leaves = $model::find()->leaves()->all();
-        if (!empty($leaves)) {
-            foreach ($leaves as $leave) {
-                $leave->tree = $tree;
-                $leave->depth = $depth;
-                $leave->save();
-                $this->rebaseLeaves($leave, $tree, $depth++);
-            }
-        }
     }
 
     protected function findModel($id)

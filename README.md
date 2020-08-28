@@ -15,7 +15,7 @@ php composer.phar require --prefer-dist it-yakutia/yii2-collective "*"
 
 or add
 
-```
+```json
 "it-yakutia/yii2-collective": "*"
 ```
 
@@ -24,10 +24,17 @@ to the require section of your `composer.json` file.
 Add migration path in your console config file:
 
 ```php
-'migrationPath' => [
+'controllerMap' => [
     ...
-    '@vendor/it-yakutia/collective/src/migrations',
-],
+    'migration' => [
+        ...
+        'migrationPath' => [
+            ...
+            '@vendor/it-yakutia/collective/src/migrations',
+            ...
+        ],
+    ]
+]
 ```
 
 Usage

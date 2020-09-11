@@ -70,16 +70,8 @@ class BackController extends Controller
         $model = new Collective();
         if (!empty(Yii::$app->request->post('Collective'))) {
             $post = Yii::$app->request->post('Collective');
-            $model->name = $post['name'];
-            $model->description = $post['description'];
-            $model->post =  $post['post'];
-            $model->phone = $post['phone'];
-            $model->photo = $post['photo'];
-            $model->email = $post['email'];
-            $model->vk_link = $post['vk_link'];
-            $model->fb_link = $post['fb_link'];
-            $model->inst_link = $post['inst_link'];
-            $model->position = $post['position'];
+            $model->load(Yii::$app->request->post());
+
             $parent_id = $post['parentId'];
 
             if (empty($parent_id)) {
@@ -110,16 +102,8 @@ class BackController extends Controller
         if (!empty(Yii::$app->request->post('Collective'))) {
 
             $post  = Yii::$app->request->post('Collective');
-            $model->name = $post['name'];
-            $model->description = $post['description'];
-            $model->post =  $post['post'];
-            $model->phone = $post['phone'];
-            $model->photo = $post['photo'];
-            $model->email = $post['email'];
-            $model->vk_link = $post['vk_link'];
-            $model->fb_link = $post['fb_link'];
-            $model->inst_link = $post['inst_link'];
-            $model->position = $post['position'];
+            $model->load(Yii::$app->request->post());
+
             $parent_id = $post['parentId'];
 
             if ($model->save()) {

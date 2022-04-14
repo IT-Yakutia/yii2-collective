@@ -51,6 +51,7 @@ class Collective extends ActiveRecord
             [['position'], 'default', 'value' => 0],
             [['tree', 'sort', 'lft', 'rgt', 'depth', 'position', 'is_publish', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'photo', 'post', 'phone', 'email', 'vk_link', 'fb_link', 'inst_link'], 'string', 'max' => 255],
+            ['description', 'string'],
         ];
     }
 
@@ -61,6 +62,7 @@ class Collective extends ActiveRecord
             'name' => 'ФИО',
             'photo' => 'Фото',
             'post' => 'Должность',
+            'description' => 'Подробнее',
             'phone' => 'Телефон',
             'email' => 'Email',
             'vk_link' => 'Ссылка VK',

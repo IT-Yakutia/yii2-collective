@@ -51,3 +51,19 @@ Add RBAC roles:
 ```
 collective
 ```
+
+Custom view file:
+
+```php
+'custom_view_for_modules' => [
+    'collective_front' => [
+        'index' => '@frontend/views/front_page/index',
+        '_item' => '@frontend/views/front_page/_item',
+        'view' => '@frontend/views/front_page/view',
+    ],
+],
+```
+
+```php
+<?= Url::toRoute(['/collective/front/index']); ?>
+```

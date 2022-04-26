@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <section class="container">
         <div class="row">
             <div class="col-12 col-lg-4">
-                <img class="mw-100" src="<?= $model->photo; ?>" alt="<?= $model->name; ?>">
+                <img class="mw-100 mb-3" src="<?= $model->photo; ?>" alt="<?= $model->name; ?>">
                 <p>Телефон: <?= $model->phone; ?></p>
                 <p>Эл. почта: <?= $model->email; ?></p>
             </div>

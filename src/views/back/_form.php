@@ -46,13 +46,13 @@ use yii\widgets\ActiveForm;
     <div class="row">
         <div class="col s12 m6 l6">
             <?= $form->field($model, 'photo')->widget(Cropper::class, [
-                'aspectRatio' => 960/1280,
-                'maxSize' => [1280, 960, 'px'],
-                'minSize' => [128, 96, 'px'],
+                'aspectRatio' => 1280/960,
+                'maxSize' => [960, 1280, 'px'],
+                'minSize' => [96, 128, 'px'],
                 'startSize' => [100, 100, '%'],
                 'uploadUrl' => Url::to(['/collective/back/uploadImg']),
             ]); ?>
-            <small>Your upload img have to has maximum size of: 1280x960 px and 2Mb</small>
+            <small>Your upload img have to has maximum size of: 960x1280 px and 2Mb</small>
         </div>
     </div>
 
